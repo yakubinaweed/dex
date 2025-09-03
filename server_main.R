@@ -299,7 +299,7 @@ mainServer <- function(input, output, session, data_reactive, selected_dir_react
     filename = function() {
       plot_title <- plot_title_rv()
       if (is.null(plot_title) || plot_title == "") {
-        plot_title <- "RefineR_Report"
+        plot_title <- "RefineR_Result"
       } else {
         plot_title <- gsub("[^a-zA-Z0-9_-]", "_", plot_title)
       }
@@ -309,61 +309,13 @@ mainServer <- function(input, output, session, data_reactive, selected_dir_react
       # Ensure analysis is complete before attempting to save
       req(refiner_model_rv())
 
-      # Open a new PDF device with the output file name and onefile = TRUE
-      pdf(file, width = 8.5, height = 11, onefile = TRUE)
-
-      # Page 1: User Inputs and Summary
-      # Set margins for the first page
-      par(mar = c(0, 0, 0, 0))
+      pdf(file, width = 11, height = 8.5) # Set page size for PDF
       
-      # Use a new page for the text content
-      plot.new()
-      
-      # Title and text content
-      title(main = "RefineR Analysis Report", cex.main = 2, font.main = 2)
-      
-      # User Inputs
-      text(0.1, 0.9, "User Inputs:", adj = 0, font = 2, cex = 1.2)
-      text(0.1, 0.85, paste("Gender Choice:", input$gender_choice), adj = 0)
-      text(0.1, 0.8, paste("Age Range:", input$age_range[1], "-", input$age_range[2], "years"), adj = 0)
-      text(0.1, 0.75, paste("Value Column:", input$col_value), adj = 0)
-      text(0.1, 0.7, paste("Age Column:", input$col_age), adj = 0)
-      text(0.1, 0.65, paste("Gender Column:", input$col_gender), adj = 0)
-      text(0.1, 0.6, paste("Bootstrap Iterations:", input$nbootstrap_speed), adj = 0)
-      text(0.1, 0.55, paste("Transformation Model:", input$model_choice), adj = 0)
-      text(0.1, 0.5, paste("Reference Lower Limit:", ifelse(is.na(input$ref_low), "N/A", input$ref_low)), adj = 0)
-      text(0.1, 0.45, paste("Reference Upper Limit:", ifelse(is.na(input$ref_high), "N/A", input$ref_high)), adj = 0)
-      text(0.1, 0.4, paste("Unit of Measurement:", input$unit_input), adj = 0)
-      
-      # Analysis Summary
-      text(0.1, 0.3, "Analysis Summary:", adj = 0, font = 2, cex = 1.2)
-      
-      # Get the summary text
-      summary_text <- capture.output(print(refiner_model_rv()))
-      
-      # Define a starting y-coordinate for the summary text
-      text_y <- 0.25
-      
-      # Iterate over each line of the summary text and add it to the plot
-      for (line in summary_text) {
-        # Check for empty lines to avoid printing them
-        if (nchar(line) > 0) {
-          text(0.1, text_y, line, adj = 0, cex = 0.8)
-          # Decrement the y-coordinate for the next line
-          text_y <- text_y - 0.02 # Adjust spacing here as needed
-        }
-      }
-      
-      # Page 2: Plot
-      # Create a new page for the plot
-      plot.new()
-      # Reset margins for the plot
-      par(mar = c(5, 4, 4, 2) + 0.1)
-      
+      # Plot the graph to the PDF device
       generate_refiner_plot(refiner_model_rv(), plot_title_rv(),
                             sprintf("%s [%s]", input$col_value, input$unit_input),
                             input$ref_low, input$ref_high)
-
+      
       # Close the PDF device
       dev.off()
     }
