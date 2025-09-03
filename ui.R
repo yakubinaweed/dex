@@ -96,6 +96,7 @@ ui <- navbarPage(
         actionButton("analyze_btn", "Run Analysis", class = "btn-primary"),
         actionButton("reset_btn", "Reset File", class = "btn-secondary"),
         shinyFiles::shinyDirButton(id = "select_dir_btn", label = "Select Output Directory", title = "Select a directory to save plots", style = "margin-top: 5px;"),
+        downloadButton("save_to_pdf_btn", "Save to PDF", class = "btn-info"),
         div(style = "margin-top: 5px; display: flex; align-items: center; justify-content: flex-start; width: 100%;",
             prettySwitch(inputId = "enable_directory", label = "Auto-Save Graph", status = "success", fill = TRUE, inline = TRUE)
         ),
