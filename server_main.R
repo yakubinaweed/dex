@@ -294,85 +294,8 @@ mainServer <- function(input, output, session, data_reactive, selected_dir_react
                           input$ref_low, input$ref_high)
   })
 
-  # Download handler for the PDF button
-  output$save_to_pdf_btn <- downloadHandler(
-    filename = function() {
-      plot_title <- plot_title_rv()
-      if (is.null(plot_title) || plot_title == "") {
-        plot_title <- "RefineR_Result"
-      } else {
-        plot_title <- gsub("[^a-zA-Z0-9_-]", "_", plot_title)
-      }
-      paste0(plot_title, "_", format(Sys.Date(), "%Y%m%d"), ".pdf")
-    },
-    content = function(file) {
-      # Ensure analysis is complete before attempting to save
-      req(refiner_model_rv())
-
-      pdf(file, width = 11, height = 8.5) # Set page size for PDF
-      
-      # Plot the graph to the PDF device
-      generate_refiner_plot(refiner_model_rv(), plot_title_rv(),
-                            sprintf("%s [%s]", input$col_value, input$unit_input),
-                            input$ref_low, input$ref_high)
-      
-      # Add a new page for the summary and user inputs
-      plot.new()
-      
-      # Set up plot area for text
-      par(mar = c(0, 0, 0, 0), oma = c(0, 0, 0, 0))
-      plot.window(xlim = c(0, 1), ylim = c(0, 1))
-      
-      # Add main title
-      text(x = 0.5, y = 0.95, labels = "RefineR Analysis Report", cex = 1.5, font = 2, adj = 0.5)
-      
-      y_pos <- 0.90
-      
-      # Section 1: User Inputs
-      text(x = 0.05, y = y_pos, labels = "User Inputs", cex = 1.2, font = 2, adj = 0)
-      y_pos <- y_pos - 0.05
-      
-      input_lines <- c(
-        paste("Gender Choice:", input$gender_choice),
-        paste("Age Range:", paste(input$age_range, collapse = " to ")),
-        paste("Value Column:", input$col_value),
-        paste("Age Column:", input$col_age),
-        paste("Gender Column:", if(input$col_gender == "") "None Selected" else input$col_gender),
-        paste("Bootstrap Speed:", input$nbootstrap_speed),
-        paste("Transformation Model:", input$model_choice),
-        paste("Reference Lower Limit:", if(is.na(input$ref_low)) "Not set" else input$ref_low),
-        paste("Reference Upper Limit:", if(is.na(input$ref_high)) "Not set" else input$ref_high),
-        paste("Unit of Measurement:", if(input$unit_input == "") "Not set" else input$unit_input)
-      )
-      
-      for (line in input_lines) {
-        text(x = 0.05, y = y_pos, labels = line, adj = 0, cex = 0.9)
-        y_pos <- y_pos - 0.025
-      }
-      
-      y_pos <- y_pos - 0.03 # Add spacing
-      
-      # Section 2: Analysis Summary
-      text(x = 0.05, y = y_pos, labels = "Analysis Summary", cex = 1.2, font = 2, adj = 0)
-      y_pos <- y_pos - 0.05
-      
-      # Add note about removed rows
-      filtered_result <- filtered_data_reactive()
-      if (!is.null(filtered_result$removed_rows)) {
-        text(x = 0.05, y = y_pos, labels = paste0("Note: ", filtered_result$removed_rows, " rows were removed due to missing or invalid data."), adj = 0, cex = 0.9)
-        y_pos <- y_pos - 0.025
-      }
-      
-      # Capture the refineR summary
-      summary_text <- capture.output(print(refiner_model_rv()))
-      
-      for (line in summary_text) {
-        text(x = 0.05, y = y_pos, labels = line, adj = 0, cex = 0.9)
-        y_pos <- y_pos - 0.025
-      }
-      
-      # Close the PDF device
-      dev.off()
-    }
-  )
+  #output$save_to_pdf_btn <- downloadHandler(
+  #  content = function(file) {
+  
+  #)
 }
